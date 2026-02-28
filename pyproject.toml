@@ -11,7 +11,7 @@ dependencies = [
     "deepeval>=3.3.9",
     "dspy>=3.0.3",
     "fastapi>=0.118.0",
-    "gradio>=5.49.0",
+    "gradio==5.49.1",
     "gradio-tools>=0.0.9",
     "ipykernel>=6.30.1",
     "ipywidgets>=8.1.7",
