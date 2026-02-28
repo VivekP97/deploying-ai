@@ -5,6 +5,7 @@ from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from langchain_core.messages import AnyMessage, SystemMessage, ToolMessage
 from typing_extensions import TypedDict, Annotated
+from assignment_chat.pokemon_tools import get_pokemon_info, get_pokemon_ability_info
 import operator
 
 from dotenv import load_dotenv
@@ -14,48 +15,17 @@ import requests
 load_dotenv(".env")
 load_dotenv(".secrets")
 
-
-
-@tool
-def get_cat_facts(n:int=1):
-    """
-    Returns n cat facts from the Meowfacts API.
-    """
-    url = "https://meowfacts.herokuapp.com/"
-    params = {
-        "count": n
-    }
-    response = requests.get(url, params=params)
-    resp_dict = json.loads(response.text)
-    facts_list = resp_dict.get("data", [])
-    facts = "\n".join([f"{i+1}. {fact}\n" for i, fact in enumerate(facts_list)])
-    return facts
-
-@tool
-def get_dog_facts(n:int=1):
-    """
-    Returns n dog facts from the Dog API.
-    """
-    url = "http://dogapi.dog/api/v2/facts"
-    params = {
-        "limit": n
-    }
-    response = requests.get(url, params=params)
-    resp_dict = json.loads(response.text)
-    facts_list = resp_dict.get("data", [])
-    facts = "\n".join([f"{i+1}. {fact['attributes']['body']}\n" for i, fact in enumerate(facts_list)])
-    return facts
+all_tools = [get_pokemon_info, get_pokemon_ability_info]
 
 def get_model_with_tools():
     model = init_chat_model(
         "openai:gpt-4o-mini",
-        temperature=0.7,
+        temperature=0.2,
         base_url='https://k7uffyg03f.execute-api.us-east-1.amazonaws.com/prod/openai/v1',
         default_headers={"x-api-key": os.getenv('API_GATEWAY_KEY')}
     )
     # Augment the LLM with tools
-    tools = [get_cat_facts, get_dog_facts]
-    model_with_tools = model.bind_tools(tools)
+    model_with_tools = model.bind_tools(all_tools)
     return model_with_tools
 
 class MessagesState(TypedDict):
@@ -70,7 +40,7 @@ def llm_call(state: dict):
             model_with_tools.invoke(
                 [
                     SystemMessage(
-                        content="You are a helpful assistant tasked with stating interesting and fun facts about cats and dogs."
+                        content="You are a helpful assistant like the Pokedex from the Pokemon video games that returns information about pokemon and their special abilities."
                     )
                 ]
                 + state["messages"]
@@ -81,8 +51,7 @@ def llm_call(state: dict):
 
 def tool_node(state: dict):
     """Performs the tool call"""
-    tools = [get_cat_facts, get_dog_facts]
-    tools_by_name = {tool.name: tool for tool in tools}
+    tools_by_name = {tool.name: tool for tool in all_tools}
 
     result = []
     for tool_call in state["messages"][-1].tool_calls:
