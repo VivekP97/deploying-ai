@@ -6,7 +6,7 @@ from langchain.tools import tool
 from langchain_core.messages import AnyMessage, SystemMessage, ToolMessage
 from typing_extensions import TypedDict, Annotated
 from assignment_chat.pokemon_tools import get_pokemon_info, get_pokemon_ability_info
-from assignment_chat.prompts import system_prompt
+from assignment_chat.prompts import chat_system_prompt
 import operator
 
 from dotenv import load_dotenv
@@ -41,7 +41,7 @@ def llm_call(state: dict):
             model_with_tools.invoke(
                 [
                     SystemMessage(
-                        content=system_prompt
+                        content=chat_system_prompt
                     )
                 ]
                 + state["messages"]
