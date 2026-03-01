@@ -1,4 +1,5 @@
 from assignment_chat.main import get_assignment_chat_agent
+from assignment_chat.music_search import init_music_database
 from langchain_core.messages import HumanMessage, AIMessage
 import gradio as gr
 from dotenv import load_dotenv
@@ -8,7 +9,11 @@ from utils.logger import get_logger
 
 _logs = get_logger(__name__)
 
+# Initialize the chat agent
 llm = get_assignment_chat_agent()
+
+# Initialize the chromadb database (for the Music Search service)
+init_music_database()
 
 load_dotenv('.secrets')
 
