@@ -8,6 +8,7 @@ from typing_extensions import TypedDict, Annotated
 from assignment_chat.pokemon_tools import get_pokemon_info, get_pokemon_ability_info
 #from assignment_chat.basketball_tools import get_basketball_roster_info, get_basketball_games_schedule_info, get_basketball_team_info
 from assignment_chat.crypto_tools import get_encryption, get_decryption, get_hash
+from assignment_chat.music_search import search_music_albums
 from assignment_chat.prompts import chat_system_prompt
 import operator
 
@@ -18,7 +19,7 @@ import requests
 load_dotenv(".env")
 load_dotenv(".secrets")
 
-all_tools = [get_pokemon_info, get_pokemon_ability_info, get_encryption, get_decryption, get_hash]
+all_tools = [get_pokemon_info, get_pokemon_ability_info, get_encryption, get_decryption, get_hash, search_music_albums]
 
 def get_model_with_tools():
     model = init_chat_model(
