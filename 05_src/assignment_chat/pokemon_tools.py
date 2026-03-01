@@ -26,6 +26,7 @@ def get_pokemon_info(pokemon_name: str = "flygon"):
     """
     Returns information about the specified pokemon from the Pokemon API.
     """
+    _logs.debug(f"[get_pokemon_info] Tool invoked!")
     # Make pokemon name lowercase and strip whitespace
     pokemon_name = pokemon_name.lower().strip()
 
@@ -54,6 +55,7 @@ def get_pokemon_ability_info(ability_name: str = "battle-armor"):
     """
     Returns information about the specified ability from the Pokemon API.
     """
+    _logs.debug(f"[get_pokemon_ability_info] Tool invoked!")
     # Make ability lowercase and strip whitespace
     ability_name = ability_name.lower().strip()
 
