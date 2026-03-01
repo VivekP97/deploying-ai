@@ -1,11 +1,17 @@
+from typing import Dict
 from openai import OpenAI
 from langchain.tools import tool
 import requests
 import json
 import os
 from utils.logger import get_logger
+from assignment_chat.basketball_teams import all_nba_teams
 
 _logs = get_logger(__name__)
+
+# Define the BallDontLie API key here so that this code works for others that run it.
+# Normally, it would go in the .secrets file.
+balldontlie_api_key = "6712f035-bd42-4cf8-88e4-fc7bffdbf25e"
 
 # Define the model client
 client = OpenAI(base_url='https://k7uffyg03f.execute-api.us-east-1.amazonaws.com/prod/openai/v1', 
@@ -15,59 +21,75 @@ client = OpenAI(base_url='https://k7uffyg03f.execute-api.us-east-1.amazonaws.com
 # Define the web_search tool for retrieving information about basketball and the NBA.
 tools = [
     {
-        "type": "web_search",
-        "name": "get_basketball_updates",
-        "description": "Perform a web search to get up-to-date information about the given question or query which pertains to basketball, specifically with the National Basketball Association.",
+        "type": "function",
+        "name": "get_basketball_players_list",
+        "description": "Retrieve the list of players for the specified basketball team.",
         "parameters": {
             "type": "object",
             "properties": {
-                "search_query": {
+                "team_name": {
                     "type": "string",
-                    "description": "The question or query to search on the internet.",
+                    "description": "The name of the basketball team.",
                 }
             },
-            "required": ["search_query"],
+            "required": ["team_name"],
             "additionalProperties": False,
         },
         "strict": True,
     },
+    {
+        "type": "function",
+        "name": "get_basketball_games_info",
+        "description": "Retrieve information about basketball games in the 2025 NBA season.",
+        "strict": True,
+    },
 ]
+
+# This function searches the all_nba_teams list for the given team name.
+def find_team_by_name(team_name: str) -> Dict:
+    for tm in all_nba_teams:
+        if team_name.lower() in tm["full_name"].lower():
+            return tm["id"]
+
+    return {}
 
 # Initiate the input list which we will append the tool output to later.
 input_list = [
     {"role": "user", "content": "Who are the top 3 players on the #1 seed in the Eastern Conference?"}
 ]
 
-def get_basketball_updates(search_query: str) -> str:
+@tool
+def get_nba_info(search_query: str) -> str:
     """
-    Search the internet to get up-to-date information about the given question or query about basketball, specifically with the National Basketball Association. 
-    The response should contain the most up-to-date information as of the current date.
+    Retrieve information about teams, players, and games in the National Basketball Association.
     """
-    _logs.debug(f'[get_basketball_updates] Getting answer for: '{search_query}');
+    _logs.debug(f"[get_nba_info] Getting answer for: '{search_query}'")
     response = client.responses.create(
         model="gpt-4o-mini",
         tools=tools,
-        input=search_query,
+        input=search_query
     )
     return response.output
 
+# Tool to get a list of players for a given team.
+def get_basketball_players_list(team_name: str = "toronto raptors") -> str:
+    """
+    Retrieve the list of players for the specified team in the National Basketball Association.
+    """
 
+    # Use the team name to get the team ID
+    team_obj = find_team_by_name(team_name)
 
-def get_horoscope_from_service(sign:str, day:str):
-    url = "https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily"
-    params = {
-        "sign": sign.capitalize(),
-        "day": day.upper()
-    }
-    response = requests.get(url, params=params)
-    return response
+    url = f"https://api.balldontlie.io/v1/players?team_ids[]={team_obj.id}"
+    response = requests.get(url, headers={'Authorization': balldontlie_api_key})
+    return response.text
 
+# Tool to get information about games this NBA season.
+def get_basketball_games_info() -> str:
+    """
+    Retrieve information about basketball games for the 2025 NBA season.
+    """
 
-
-def get_horoscope_from_response(sign:str, response:requests.Response) -> str:
-    resp_dict = json.loads(response.text)
-    data = resp_dict.get("data")
-    horoscope_data = data.get("horoscope_data", "No horoscope found.")
-    date = data.get("date", "No date found.")
-    horoscope = f"Horoscope for {sign.capitalize()} on {date}: {horoscope_data}"
-    return horoscope
+    url = f"https://api.balldontlie.io/v1/games?start_date=2025-10-01"
+    response = requests.get(url, headers={'Authorization': balldontlie_api_key})
+    return response.text
