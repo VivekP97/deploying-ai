@@ -1,5 +1,7 @@
 ## Assignment 2 Chatbot Overview
 
+---
+
 ### General Overview
 
 This chatbot fulfills the guidelines and requirements described for Assignment 2. 
@@ -18,9 +20,20 @@ This chatbot leverages concepts learned in class to implement 3 unique services 
 2. (Not yet completed)
 3. Perform encryption, decryption, and hashing.
 
+**Main files:**
+
+- `main.py` -> Contains the chat agent model definition and configures the tools for it.
+- `app.py` -> Initializes the chat agent interface.
+- `prompts.py` -> Contains the system prompt defined for the chat agent model.
+
 ### API Calls: Pokemon Service
 
 This service provides information about pokemon and their special abilities. It integrates with the free API described at https://pokeapi.co/ to retrieve the information. Responses from the API are rewritten in a more friendly tone, as if speaking to a child.
+
+**Relevant files:**
+
+- `pokemon_tools.py` -> Contains the definitions of the tools that interact with the API
+- `pokemon_types.py` -> Contains the definitions of custom types (TypedDict) used to represent data returned from the API
 
 ### Semantic Query: _Not yet completed_
 
@@ -32,9 +45,16 @@ This service implements basic cryptography functions: encryption, decryption, an
 
 I chose to have the chatbot return and accept ciphertext as a hexadecimal value instead of bytes to avoid issues with bytes not being represented correctly in the chat. Hex values are lossless so it will ensure that users can encrypt and decrypt text without any issues.
 
+**Relevant files:**
+
+- `crypto_tools.py` -> Contains the definitions of the tools for the model to leverage and the function definitions
+- `pokemon_types.py` -> Contains the definitions of custom types (TypedDict) used to represent data returned from the API
+
 _In the `assignment_chat` folder, you will find the `basketball_teams.py` and `basketball_tools.py` files. These files were my initial attempt to implement the "Your Choice" service. I tried to use a free API for NBA data to enable users to ask questions about NBA teams, players, and schedules, but I was not able to get it working correctly. Instead, I decided to implement the cryptography functions. I left the code there just to show my attempts._
 
 ## Running the application
+
+---
 
 All of the files required to run my chatbot are contained within the `05_src/assignment_chat` folder, with the exception of the the `.env` and `.secrets` files which are contained in the `05_src` folder.
 
