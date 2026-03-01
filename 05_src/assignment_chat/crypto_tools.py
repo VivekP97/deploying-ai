@@ -8,7 +8,6 @@ from utils.logger import get_logger
 _logs = get_logger(__name__)
 
 key = Fernet.generate_key()
-_logs.debug(f"[crypto_tools] Generated Fernet key: {key}")
 fernet = Fernet(key)
 
 # Define the model client
