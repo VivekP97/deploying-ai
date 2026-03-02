@@ -43,6 +43,8 @@ The chatbot will return the top n results from the query and provide brief descr
 
 The music albums are stored in an in-memory chromadb instance that is configured with file persistence. My original intention was to set up the chromadb instance in docker and have my model interact with that to retrieve the data, but I was having trouble getting it to work correctly when following the instructions in `02_7_vectordb_docker.ipynb`. You can see my attempts in that Jupyter notebook which I have committed and included in this PR. As an alternative, I used the in-memory DB instead.
 
+The `assignment_chat` app will check if the `music_albums` collection exists and contains data. If it does not contain data, it will be populated with the data from `music_data.json`. If there is data in the collection, we simply skip. Therefore, running the `assignment_chat` app will automatically ensure the database is set up correctly for the semantic search. 
+
 ** Relevant files/folders:**
 
 - `music_data.json` -> Contains an array of various albums from various artists with descriptions defining the overall mood or theme of the album. This data is loaded in to the vector DB.
@@ -73,4 +75,5 @@ The `assignment_chat` application can be run by doing the following:
 1. Open a terminal (or Git Bash for Windows).
 2. Navigate to the `05_src` folder of this repository.
 3. Execute the command `python -m assignment_chat.app`. Alternatively, you can run the starter script I created for convenience: `./start_a2.sh`.
+  - Note: The command in the `start_a2.sh` script contains the flag `-u` which makes python not buffer output and instead output it immediately. I had to do this in order to view logs in the terminal on my Windows Git Bash terminal.
 4. Open a browser and enter `http://localhost:7860` into the navigation bar to open the gradio chat interface.
