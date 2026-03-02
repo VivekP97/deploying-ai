@@ -19,8 +19,10 @@ import requests
 load_dotenv(".env")
 load_dotenv(".secrets")
 
+# Define a list to contain all the tools that the model has access to
 all_tools = [get_pokemon_info, get_pokemon_ability_info, get_encryption, get_decryption, get_hash, search_music_albums]
 
+# Initialize the model with the tools
 def get_model_with_tools():
     model = init_chat_model(
         "openai:gpt-4o-mini",
@@ -28,7 +30,7 @@ def get_model_with_tools():
         base_url='https://k7uffyg03f.execute-api.us-east-1.amazonaws.com/prod/openai/v1',
         default_headers={"x-api-key": os.getenv('API_GATEWAY_KEY')}
     )
-    # Augment the LLM with tools
+    # Bind the tools to the model
     model_with_tools = model.bind_tools(all_tools)
     return model_with_tools
 

@@ -19,6 +19,7 @@ _logs = get_logger(__name__)
 load_dotenv(".env")
 load_dotenv(".secrets")
 
+# Define the base URL for the Pokemon API
 pokemon_api_v2_base_url = "https://pokeapi.co/api/v2"
 
 @tool
@@ -40,6 +41,7 @@ def get_pokemon_info(pokemon_name: str = "flygon"):
 
     data = response.json()
 
+    # Copy only the necessary data from the response
     pokemon_info: PokemonInfoResponseData = {
         "name": data["name"],
         "types": data.get("types", []),
@@ -69,7 +71,7 @@ def get_pokemon_ability_info(ability_name: str = "battle-armor"):
 
     data = response.json()
 
-    # Filter effect_entries for the English version
+    # Filter effect_entries for the English version (there are entries for other languages)
     effect_entries: list[EffectEntriesElement] = [
         {
             "effect": entry["effect"],
@@ -79,6 +81,7 @@ def get_pokemon_ability_info(ability_name: str = "battle-armor"):
         if entry["language"]["name"] == "en"
     ]
 
+    # Copy only the necessary data from the response
     ability_info: AbilityInfoResponseData = {
         "name": data["name"],
         "effect_entries": effect_entries,

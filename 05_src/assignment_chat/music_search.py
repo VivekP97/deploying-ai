@@ -32,7 +32,7 @@ def load_music_albums() -> list[dict[str, str]]:
 
 # This function generates embeddings for the provided list of data
 def generate_embeddings_for_albums(data: list[dict[str, str]]):
-    # Create a list of strings to represent the albums (which are dictionaries)
+    # Create a list of strings to represent the album data (which are currently dictionaries)
     documents = [json.dumps(item) for item in data]
 
     # Generate the embeddings all at once instead of individual calls
@@ -40,6 +40,7 @@ def generate_embeddings_for_albums(data: list[dict[str, str]]):
         input = documents, 
         model = "text-embedding-3-small"
     )
+    # Return the embeddings as a list of float lists
     return [item.embedding for item in response.data]
 
 # This function generates embeddings for the provided query
@@ -49,6 +50,7 @@ def generate_embedding_for_query(query: str):
         input = query, 
         model = "text-embedding-3-small"
     )
+    # Return the embedding as a single list of floats
     return response.data[0].embedding
 
 # This function adds the data to the collection
@@ -59,7 +61,7 @@ def add_data_to_collection(data: list[dict[str, str]], collection: chromadb.Coll
     # Generate ids for the albums
     ids = [f"id{i}" for i in range(len(data))]
 
-    # Create a list of strings to represent the albums (which are dictionaries)
+    # Create a list of strings to represent the albums (which are currently dictionaries)
     documents = [json.dumps(item) for item in data]
 
     # Add the data to the collection
@@ -68,7 +70,7 @@ def add_data_to_collection(data: list[dict[str, str]], collection: chromadb.Coll
         embeddings=embeddings,
         ids=ids)
 
-# This function initializes the vector database client and the collection
+# This function initializes the vector DB collection data
 def init_music_database():
     _logs.info("[init_music_database] Initializing music database")
     _logs.info(f"[init_music_database] Existing collections: {chroma_client.list_collections()}")

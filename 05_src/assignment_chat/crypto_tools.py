@@ -159,17 +159,20 @@ def get_hash(plaintext: str) -> str:
     prompt = f"Generate a hash value for the provided plaintext: {plaintext}"
     return _run_inner_llm_with_tool_loop(prompt)
 
+# Function to encrypt the given plaintext
 def encrypt_text(plaintext: str) -> str:
     val = fernet.encrypt(plaintext.encode())
     _logs.debug(f"[encrypt_text] Encrypted text in hexadecimal: {val.hex()}")
     return val.hex()
 
+# Function to decrypt the given ciphertext
 def decrypt_text(ciphertext_hex: str) -> str:
     ciphertext = bytes.fromhex(ciphertext_hex)
     val = fernet.decrypt(ciphertext)
     _logs.debug(f"[decrypt_text] Decrypted text: {val.decode()}")
     return val.decode()
 
+# Function to generate a hash value for the given plaintext
 def generate_hash(plaintext: str) -> str:
     val = hashlib.sha256(plaintext.encode()).hexdigest()
     _logs.debug(f"[generate_hash] Hash value: {val}")

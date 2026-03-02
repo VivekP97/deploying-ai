@@ -37,11 +37,13 @@ def assignment_chat(message: str, history: list[dict]) -> str:
     response = llm.invoke(state)
     return response['messages'][len(response['messages']) - 1].content
 
+# Define the chat interface
 chat = gr.ChatInterface(
     fn=assignment_chat,
     type="messages",
 )
 
+# Launch the chat interface
 if __name__ == "__main__":
     _logs.info('Starting Assignment Chat App...')
     chat.launch()
