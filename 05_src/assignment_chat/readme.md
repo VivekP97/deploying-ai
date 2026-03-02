@@ -35,9 +35,19 @@ This service provides information about pokemon and their special abilities. It 
 - `pokemon_tools.py` -> Contains the definitions of the tools that interact with the API
 - `pokemon_types.py` -> Contains the definitions of custom types (TypedDict) used to represent data returned from the API
 
-### Semantic Query: _Not yet completed_
+### Semantic Query: Music Recommendation Service
 
-This service still needs to be implemented.
+This service provides music recommendations to the user based on the kind of vibe or mood they are looking for. Users can ask the model what to listen to for a "relaxed weekend in the home", "working out at the gym", or other similar phrases. Additionally, they can specify vibes like "futuristic" or "jazzy".
+
+The chatbot will return the top n results from the query and provide brief descriptions in the model's own words. 
+
+The music albums are stored in an in-memory chromadb instance that is configured with file persistence. My original intention was to set up the chromadb instance in docker and have my model interact with that to retrieve the data, but I was having trouble getting it to work correctly when following the instructions in `02_7_vectordb_docker.ipynb`. You can see my attempts in that Jupyter notebook which I have committed and included in this PR. As an alternative, I used the in-memory DB instead.
+
+** Relevant files/folders:**
+
+- `music_data.json` -> Contains an array of various albums from various artists with descriptions defining the overall mood or theme of the album. This data is loaded in to the vector DB.
+- `music_search.py` -> Contains the tools and functions required to interact with the chromadb instance and the model to create the embeddings.
+- `music_db` -> This folder contains the files relevant to the local chromadb instance.
 
 ### Your Choice: Cryptography Service
 
