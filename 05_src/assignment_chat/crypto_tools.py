@@ -15,8 +15,10 @@ client = OpenAI(base_url='https://k7uffyg03f.execute-api.us-east-1.amazonaws.com
             api_key='any value',
             default_headers={"x-api-key": os.getenv('API_GATEWAY_KEY')})
 
+# Define the system instructions for the local model to use the defined tools
 sys_instructions = "You MUST only use the tools provided to you to complete the given task. If the tools do not enable you to complete the task, then say that."
 
+# Define the list of tools available for cryptography actions
 tools = [
     {
         "type": "function",
@@ -77,6 +79,7 @@ def _run_inner_llm_with_tool_loop(prompt: str, max_turns: int = 3) -> str:
     """
     input_list = [{"role": "user", "content": prompt}]
 
+    # Use a max_turns limit to prevent infinite loops with tool calls
     for _ in range(max_turns):
         response = client.responses.create(
             model="gpt-4o-mini",
@@ -91,19 +94,32 @@ def _run_inner_llm_with_tool_loop(prompt: str, max_turns: int = 3) -> str:
         # Execute any encrypt_text tool calls and append their outputs
         has_tool_call = False
         for item in response.output:
-            if getattr(item, "type", None) != "function_call":
+            # Skip non-function calls
+            if item.type != "function_call":
                 continue
-            if getattr(item, "name", None) != "encrypt_text":
-                continue
+
             has_tool_call = True
+
             args = json.loads(item.arguments)
-            ciphertext = encrypt_text(**args)
+
+            # Execute the appropriate tool function and store the result
+            if item.name == "encrypt_text":
+                tool_output = encrypt_text(**args)
+            elif item.name == "decrypt_text":
+                tool_output = decrypt_text(**args)
+            elif item.name == "generate_hash":
+                tool_output = generate_hash(**args)
+            else:
+                _logs.error("[_run_inner_llm_with_tool_loop] Unknown tool call: %s", item.name)
+                continue
+
             input_list.append({
                 "type": "function_call_output",
                 "call_id": item.call_id,
-                "output": ciphertext,
+                "output": tool_output,
             })
 
+        # If no tool calls were made, return the model's output
         if not has_tool_call:
             return response.output_text
 
